@@ -12,12 +12,19 @@ import {
     RocketLaunchIcon,
     StarIcon,
     ArrowRightIcon,
-    PlayIcon
+    PlayIcon,
+    ChevronDownIcon,
+    ComputerDesktopIcon,
+    DevicePhoneMobileIcon,
+    Bars3Icon,
+    XMarkIcon
 } from '@heroicons/react/24/outline';
 
 export default function Welcome({ auth, laravelVersion, phpVersion, content = {}, hostingPackages = [], logos = {} }) {
     const [currentTestimonial, setCurrentTestimonial] = useState(0);
     const [isScrolled, setIsScrolled] = useState(false);
+    const [activeDropdown, setActiveDropdown] = useState(null);
+    const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [stats, setStats] = useState({
         users: 0,
         servers: 0,
@@ -206,6 +213,34 @@ export default function Welcome({ auth, laravelVersion, phpVersion, content = {}
         return () => window.removeEventListener('scroll', handleScroll);
     }, []);
 
+    // Close dropdown and mobile menu when clicking outside
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (!event.target.closest('.dropdown-container') && !event.target.closest('nav')) {
+                setActiveDropdown(null);
+            }
+            if (!event.target.closest('nav') && isMobileMenuOpen) {
+                setIsMobileMenuOpen(false);
+            }
+        };
+
+        document.addEventListener('click', handleClickOutside);
+        return () => document.removeEventListener('click', handleClickOutside);
+    }, [isMobileMenuOpen]);
+
+    // Close mobile menu when screen size changes to desktop
+    useEffect(() => {
+        const handleResize = () => {
+            if (window.innerWidth >= 1024) { // lg breakpoint
+                setIsMobileMenuOpen(false);
+                setActiveDropdown(null);
+            }
+        };
+
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
+
 
 
     return (
@@ -379,44 +414,233 @@ export default function Welcome({ auth, laravelVersion, phpVersion, content = {}
                         : 'bg-white/10 backdrop-blur-xl border-b border-white/20 shadow-lg shadow-black/10'
                 }`}>
                     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                        <div className="flex justify-between h-20">
+                        <div className="flex justify-between h-16 lg:h-20">
                             <div className="flex items-center">
-                                <div className="flex items-center space-x-3 hover-lift cursor-pointer group">
-                                    <div className="w-10 h-10 bg-gradient-to-r from-cyan-400 to-blue-500 rounded-lg flex items-center justify-center animate-pulse-glow group-hover:scale-110 transition-transform duration-300">
-                                        <RocketLaunchIcon className="w-6 h-6 text-white group-hover:rotate-12 transition-transform duration-300" />
-                                    </div>
-                                    <h1 className="text-2xl font-bold text-shimmer group-hover:scale-105 transition-transform duration-300">
+                                <div className="flex items-center space-x-2 hover-lift cursor-pointer group">
+                                    <img 
+                                        src="/images/logoabahweb.svg" 
+                                        alt="AbahWeb Logo" 
+                                        className="h-8 lg:h-10 w-auto group-hover:scale-105 transition-transform duration-300"
+                                    />
+                                    <h1 className="text-xl lg:text-2xl font-bold text-white group-hover:text-blue-300 transition-colors duration-300">
                                         AbahWeb
                                     </h1>
                                 </div>
                             </div>
-                            <div className="hidden md:flex items-center space-x-8">
-                                <a href="#features" className="text-white/80 hover:text-white transition-all duration-300 font-medium relative group">
-                                    Features
-                                    <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-cyan-400 to-blue-500 group-hover:w-full transition-all duration-300"></span>
-                                </a>
-                                <Link href={route('hosting-packages.index')} className="text-white/80 hover:text-white transition-all duration-300 font-medium relative group">
-                                    Hosting Packages
-                                    <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-cyan-400 to-blue-500 group-hover:w-full transition-all duration-300"></span>
-                                </Link>
-                                <a href="#stats" className="text-white/80 hover:text-white transition-all duration-300 font-medium relative group">
-                                    Analytics
-                                    <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-cyan-400 to-blue-500 group-hover:w-full transition-all duration-300"></span>
-                                </a>
-                                <a href="#testimonials" className="text-white/80 hover:text-white transition-all duration-300 font-medium relative group">
-                                    Reviews
-                                    <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-cyan-400 to-blue-500 group-hover:w-full transition-all duration-300"></span>
-                                </a>
-                                <a href="#pricing" className="text-white/80 hover:text-white transition-all duration-300 font-medium relative group">
-                                    Pricing
+                            
+                            {/* Desktop Menu */}
+                            <div className="hidden lg:flex items-center space-x-4 xl:space-x-6">
+                                {/* Domain Dropdown */}
+                                <div className="relative group dropdown-container">
+                                    <button 
+                                        className="flex items-center space-x-1 text-white/80 hover:text-white transition-all duration-300 font-medium"
+                                        onClick={() => setActiveDropdown(activeDropdown === 'domain' ? null : 'domain')}
+                                    >
+                                        <span>Domain</span>
+                                        <ChevronDownIcon className="w-4 h-4" />
+                                    </button>
+                                    {activeDropdown === 'domain' && (
+                                        <div className="absolute top-full left-0 mt-2 w-64 bg-white rounded-lg shadow-xl border border-gray-200 py-2 z-50">
+                                            <div className="px-4 py-3 border-b border-gray-100">
+                                                <h3 className="font-semibold text-gray-900">Domain Services</h3>
+                                                <p className="text-sm text-gray-600">Kelola domain Anda dengan mudah</p>
+                                            </div>
+                                            <a href="#" className="flex items-center px-4 py-3 hover:bg-gray-50 transition-colors">
+                                                <GlobeAltIcon className="w-5 h-5 text-blue-500 mr-3" />
+                                                <div>
+                                                    <div className="font-medium text-gray-900">Cari Domain</div>
+                                                    <div className="text-sm text-gray-600">Temukan domain impian Anda</div>
+                                                </div>
+                                            </a>
+                                            <a href="#" className="flex items-center px-4 py-3 hover:bg-gray-50 transition-colors">
+                                                <ShieldCheckIcon className="w-5 h-5 text-green-500 mr-3" />
+                                                <div>
+                                                    <div className="font-medium text-gray-900">Transfer Domain</div>
+                                                    <div className="text-sm text-gray-600">Pindahkan domain ke kami</div>
+                                                </div>
+                                            </a>
+                                        </div>
+                                    )}
+                                </div>
+
+                                {/* Hosting Dropdown */}
+                                <div className="relative group dropdown-container">
+                                    <button 
+                                        className="flex items-center space-x-1 text-white/80 hover:text-white transition-all duration-300 font-medium"
+                                        onClick={() => setActiveDropdown(activeDropdown === 'hosting' ? null : 'hosting')}
+                                    >
+                                        <span>Hosting</span>
+                                        <ChevronDownIcon className="w-4 h-4" />
+                                    </button>
+                                    {activeDropdown === 'hosting' && (
+                                        <div className="absolute top-full left-0 mt-2 w-64 bg-white rounded-lg shadow-xl border border-gray-200 py-2 z-50">
+                                            <div className="px-4 py-3 border-b border-gray-100">
+                                                <h3 className="font-semibold text-gray-900">Web Hosting</h3>
+                                                <p className="text-sm text-gray-600">Hosting terbaik untuk website Anda</p>
+                                            </div>
+                                            <a href="#" className="flex items-center px-4 py-3 hover:bg-gray-50 transition-colors">
+                                                <ServerIcon className="w-5 h-5 text-blue-500 mr-3" />
+                                                <div>
+                                                    <div className="font-medium text-gray-900">Shared Hosting</div>
+                                                    <div className="text-sm text-gray-600">Hosting ekonomis untuk pemula</div>
+                                                </div>
+                                            </a>
+                                            <a href="#" className="flex items-center px-4 py-3 hover:bg-gray-50 transition-colors">
+                                                <CloudIcon className="w-5 h-5 text-purple-500 mr-3" />
+                                                <div>
+                                                    <div className="font-medium text-gray-900">Cloud Hosting</div>
+                                                    <div className="text-sm text-gray-600">Performa tinggi dan scalable</div>
+                                                </div>
+                                            </a>
+                                        </div>
+                                    )}
+                                </div>
+
+                                {/* Server Dropdown */}
+                                <div className="relative group dropdown-container">
+                                    <button 
+                                        className="flex items-center space-x-1 text-white/80 hover:text-white transition-all duration-300 font-medium"
+                                        onClick={() => setActiveDropdown(activeDropdown === 'server' ? null : 'server')}
+                                    >
+                                        <span>Server</span>
+                                        <ChevronDownIcon className="w-4 h-4" />
+                                    </button>
+                                    {activeDropdown === 'server' && (
+                                        <div className="absolute top-full left-0 mt-2 w-64 bg-white rounded-lg shadow-xl border border-gray-200 py-2 z-50">
+                                            <div className="px-4 py-3 border-b border-gray-100">
+                                                <h3 className="font-semibold text-gray-900">Server Solutions</h3>
+                                                <p className="text-sm text-gray-600">Solusi server untuk bisnis Anda</p>
+                                            </div>
+                                            <a href="#" className="flex items-center px-4 py-3 hover:bg-gray-50 transition-colors">
+                                                <CpuChipIcon className="w-5 h-5 text-red-500 mr-3" />
+                                                <div>
+                                                    <div className="font-medium text-gray-900">VPS</div>
+                                                    <div className="text-sm text-gray-600">Virtual Private Server</div>
+                                                </div>
+                                            </a>
+                                            <a href="#" className="flex items-center px-4 py-3 hover:bg-gray-50 transition-colors">
+                                                <ServerIcon className="w-5 h-5 text-orange-500 mr-3" />
+                                                <div>
+                                                    <div className="font-medium text-gray-900">Dedicated Server</div>
+                                                    <div className="text-sm text-gray-600">Server khusus untuk Anda</div>
+                                                </div>
+                                            </a>
+                                        </div>
+                                    )}
+                                </div>
+
+                                {/* Tunneling Dropdown */}
+                                <div className="relative group dropdown-container">
+                                    <button 
+                                        className="flex items-center space-x-1 text-white/80 hover:text-white transition-all duration-300 font-medium"
+                                        onClick={() => setActiveDropdown(activeDropdown === 'tunneling' ? null : 'tunneling')}
+                                    >
+                                        <span>Tunneling</span>
+                                        <ChevronDownIcon className="w-4 h-4" />
+                                    </button>
+                                    {activeDropdown === 'tunneling' && (
+                                        <div className="absolute top-full left-0 mt-2 w-64 bg-white rounded-lg shadow-xl border border-gray-200 py-2 z-50">
+                                            <div className="px-4 py-3 border-b border-gray-100">
+                                                <h3 className="font-semibold text-gray-900">Tunneling Services</h3>
+                                                <p className="text-sm text-gray-600">Akses aman dan cepat</p>
+                                            </div>
+                                            <a href="#" className="flex items-center px-4 py-3 hover:bg-gray-50 transition-colors">
+                                                <ShieldCheckIcon className="w-5 h-5 text-green-500 mr-3" />
+                                                <div>
+                                                    <div className="font-medium text-gray-900">Secure Tunnel</div>
+                                                    <div className="text-sm text-gray-600">Koneksi aman dan terenkripsi</div>
+                                                </div>
+                                            </a>
+                                            <a href="#" className="flex items-center px-4 py-3 hover:bg-gray-50 transition-colors">
+                                                <RocketLaunchIcon className="w-5 h-5 text-blue-500 mr-3" />
+                                                <div>
+                                                    <div className="font-medium text-gray-900">Fast Tunnel</div>
+                                                    <div className="text-sm text-gray-600">Akses cepat tanpa batas</div>
+                                                </div>
+                                            </a>
+                                        </div>
+                                    )}
+                                </div>
+
+                                {/* Website Dropdown */}
+                                <div className="relative group dropdown-container">
+                                    <button 
+                                        className="flex items-center space-x-1 text-white/80 hover:text-white transition-all duration-300 font-medium"
+                                        onClick={() => setActiveDropdown(activeDropdown === 'website' ? null : 'website')}
+                                    >
+                                        <span>Website</span>
+                                        <ChevronDownIcon className="w-4 h-4" />
+                                    </button>
+                                    {activeDropdown === 'website' && (
+                                        <div className="absolute top-full left-0 mt-2 w-64 bg-white rounded-lg shadow-xl border border-gray-200 py-2 z-50">
+                                            <div className="px-4 py-3 border-b border-gray-100">
+                                                <h3 className="font-semibold text-gray-900">Website Builder</h3>
+                                                <p className="text-sm text-gray-600">Buat website dengan mudah</p>
+                                            </div>
+                                            <a href="#" className="flex items-center px-4 py-3 hover:bg-gray-50 transition-colors">
+                                                <ComputerDesktopIcon className="w-5 h-5 text-blue-500 mr-3" />
+                                                <div>
+                                                    <div className="font-medium text-gray-900">Website Builder</div>
+                                                    <div className="text-sm text-gray-600">Drag & drop website builder</div>
+                                                </div>
+                                            </a>
+                                            <a href="#" className="flex items-center px-4 py-3 hover:bg-gray-50 transition-colors">
+                                                <GlobeAltIcon className="w-5 h-5 text-purple-500 mr-3" />
+                                                <div>
+                                                    <div className="font-medium text-gray-900">Template Premium</div>
+                                                    <div className="text-sm text-gray-600">Template siap pakai</div>
+                                                </div>
+                                            </a>
+                                        </div>
+                                    )}
+                                </div>
+
+                                {/* Aplikasi Dropdown */}
+                                <div className="relative group dropdown-container">
+                                    <button 
+                                        className="flex items-center space-x-1 text-white/80 hover:text-white transition-all duration-300 font-medium"
+                                        onClick={() => setActiveDropdown(activeDropdown === 'aplikasi' ? null : 'aplikasi')}
+                                    >
+                                        <span>Aplikasi</span>
+                                        <ChevronDownIcon className="w-4 h-4" />
+                                    </button>
+                                    {activeDropdown === 'aplikasi' && (
+                                        <div className="absolute top-full left-0 mt-2 w-64 bg-white rounded-lg shadow-xl border border-gray-200 py-2 z-50">
+                                            <div className="px-4 py-3 border-b border-gray-100">
+                                                <h3 className="font-semibold text-gray-900">Aplikasi & Tools</h3>
+                                                <p className="text-sm text-gray-600">Tools untuk produktivitas</p>
+                                            </div>
+                                            <a href="#" className="flex items-center px-4 py-3 hover:bg-gray-50 transition-colors">
+                                                <DevicePhoneMobileIcon className="w-5 h-5 text-green-500 mr-3" />
+                                                <div>
+                                                    <div className="font-medium text-gray-900">Mobile App</div>
+                                                    <div className="text-sm text-gray-600">Kelola hosting dari HP</div>
+                                                </div>
+                                            </a>
+                                            <a href="#" className="flex items-center px-4 py-3 hover:bg-gray-50 transition-colors">
+                                                <ChartBarIcon className="w-5 h-5 text-blue-500 mr-3" />
+                                                <div>
+                                                    <div className="font-medium text-gray-900">Analytics</div>
+                                                    <div className="text-sm text-gray-600">Monitor performa website</div>
+                                                </div>
+                                            </a>
+                                        </div>
+                                    )}
+                                </div>
+
+                                {/* About Link */}
+                                <a href="#about" className="text-white/80 hover:text-white transition-all duration-300 font-medium relative group">
+                                    About
                                     <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-cyan-400 to-blue-500 group-hover:w-full transition-all duration-300"></span>
                                 </a>
                             </div>
-                            <div className="flex items-center space-x-4">
+                            
+                            {/* Desktop Auth Buttons */}
+                            <div className="hidden lg:flex items-center space-x-3 xl:space-x-4">
                                 {auth.user ? (
                                     <Link
                                         href={route('dashboard')}
-                                        className="bg-gradient-to-r from-cyan-500 to-blue-600 text-white px-6 py-3 rounded-lg font-medium hover:from-cyan-600 hover:to-blue-700 transition-all duration-200 transform hover:scale-105 shadow-lg"
+                                        className="bg-gradient-to-r from-cyan-500 to-blue-600 text-white px-4 xl:px-6 py-2 xl:py-3 rounded-lg font-medium hover:from-cyan-600 hover:to-blue-700 transition-all duration-200 transform hover:scale-105 shadow-lg text-sm xl:text-base"
                                     >
                                         Dashboard
                                     </Link>
@@ -424,299 +648,870 @@ export default function Welcome({ auth, laravelVersion, phpVersion, content = {}
                                     <>
                                         <Link
                                             href={route('login')}
-                                            className="text-white/80 hover:text-white px-4 py-2 rounded-lg font-medium transition-colors duration-200"
+                                            className="text-white/80 hover:text-white px-3 xl:px-4 py-2 rounded-lg font-medium transition-colors duration-200 text-sm xl:text-base"
                                         >
                                             Masuk
                                         </Link>
                                         <Link
                                             href={route('register')}
-                                            className="bg-gradient-to-r from-cyan-500 to-blue-600 text-white px-6 py-3 rounded-lg font-medium hover:from-cyan-600 hover:to-blue-700 transition-all duration-200 transform hover:scale-105 shadow-lg"
+                                            className="bg-gradient-to-r from-cyan-500 to-blue-600 text-white px-4 xl:px-6 py-2 xl:py-3 rounded-lg font-medium hover:from-cyan-600 hover:to-blue-700 transition-all duration-200 transform hover:scale-105 shadow-lg text-sm xl:text-base"
                                         >
                                             Daftar Gratis
                                         </Link>
                                     </>
                                 )}
                             </div>
+                            
+                            {/* Mobile Menu Button */}
+                            <div className="lg:hidden flex items-center">
+                                <button
+                                    onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                                    className="text-white/80 hover:text-white p-2 rounded-lg transition-colors duration-200"
+                                >
+                                    {isMobileMenuOpen ? (
+                                        <XMarkIcon className="w-6 h-6" />
+                                    ) : (
+                                        <Bars3Icon className="w-6 h-6" />
+                                    )}
+                                </button>
+                            </div>
                         </div>
                     </div>
+                    
+                    {/* Mobile Menu */}
+                    {isMobileMenuOpen && (
+                        <div className="lg:hidden bg-slate-900/98 backdrop-blur-xl border-t border-white/20">
+                            <div className="max-w-7xl mx-auto px-4 py-4 space-y-3">
+                                {/* Mobile Menu Items */}
+                                <div className="space-y-2">
+                                    {/* Domain */}
+                                    <div>
+                                        <button 
+                                            className="flex items-center justify-between w-full text-white/80 hover:text-white py-3 px-4 rounded-lg hover:bg-white/10 transition-all duration-300 font-medium"
+                                            onClick={() => setActiveDropdown(activeDropdown === 'domain-mobile' ? null : 'domain-mobile')}
+                                        >
+                                            <span>Domain</span>
+                                            <ChevronDownIcon className={`w-4 h-4 transition-transform duration-200 ${activeDropdown === 'domain-mobile' ? 'rotate-180' : ''}`} />
+                                        </button>
+                                        {activeDropdown === 'domain-mobile' && (
+                                            <div className="ml-4 mt-2 space-y-2">
+                                                <a href="#" className="flex items-center px-4 py-3 text-white/70 hover:text-white hover:bg-white/5 rounded-lg transition-colors">
+                                                    <GlobeAltIcon className="w-5 h-5 text-blue-400 mr-3" />
+                                                    <div>
+                                                        <div className="font-medium">Cari Domain</div>
+                                                        <div className="text-sm text-white/50">Temukan domain impian Anda</div>
+                                                    </div>
+                                                </a>
+                                                <a href="#" className="flex items-center px-4 py-3 text-white/70 hover:text-white hover:bg-white/5 rounded-lg transition-colors">
+                                                    <ShieldCheckIcon className="w-5 h-5 text-green-400 mr-3" />
+                                                    <div>
+                                                        <div className="font-medium">Transfer Domain</div>
+                                                        <div className="text-sm text-white/50">Pindahkan domain ke kami</div>
+                                                    </div>
+                                                </a>
+                                            </div>
+                                        )}
+                                    </div>
+
+                                    {/* Hosting */}
+                                    <div>
+                                        <button 
+                                            className="flex items-center justify-between w-full text-white/80 hover:text-white py-3 px-4 rounded-lg hover:bg-white/10 transition-all duration-300 font-medium"
+                                            onClick={() => setActiveDropdown(activeDropdown === 'hosting-mobile' ? null : 'hosting-mobile')}
+                                        >
+                                            <span>Hosting</span>
+                                            <ChevronDownIcon className={`w-4 h-4 transition-transform duration-200 ${activeDropdown === 'hosting-mobile' ? 'rotate-180' : ''}`} />
+                                        </button>
+                                        {activeDropdown === 'hosting-mobile' && (
+                                            <div className="ml-4 mt-2 space-y-2">
+                                                <a href="#" className="flex items-center px-4 py-3 text-white/70 hover:text-white hover:bg-white/5 rounded-lg transition-colors">
+                                                    <ServerIcon className="w-5 h-5 text-blue-400 mr-3" />
+                                                    <div>
+                                                        <div className="font-medium">Shared Hosting</div>
+                                                        <div className="text-sm text-white/50">Hosting ekonomis untuk pemula</div>
+                                                    </div>
+                                                </a>
+                                                <a href="#" className="flex items-center px-4 py-3 text-white/70 hover:text-white hover:bg-white/5 rounded-lg transition-colors">
+                                                    <CloudIcon className="w-5 h-5 text-purple-400 mr-3" />
+                                                    <div>
+                                                        <div className="font-medium">Cloud Hosting</div>
+                                                        <div className="text-sm text-white/50">Performa tinggi dan scalable</div>
+                                                    </div>
+                                                </a>
+                                            </div>
+                                        )}
+                                    </div>
+
+                                    {/* Server */}
+                                    <div>
+                                        <button 
+                                            className="flex items-center justify-between w-full text-white/80 hover:text-white py-3 px-4 rounded-lg hover:bg-white/10 transition-all duration-300 font-medium"
+                                            onClick={() => setActiveDropdown(activeDropdown === 'server-mobile' ? null : 'server-mobile')}
+                                        >
+                                            <span>Server</span>
+                                            <ChevronDownIcon className={`w-4 h-4 transition-transform duration-200 ${activeDropdown === 'server-mobile' ? 'rotate-180' : ''}`} />
+                                        </button>
+                                        {activeDropdown === 'server-mobile' && (
+                                            <div className="ml-4 mt-2 space-y-2">
+                                                <a href="#" className="flex items-center px-4 py-3 text-white/70 hover:text-white hover:bg-white/5 rounded-lg transition-colors">
+                                                    <CpuChipIcon className="w-5 h-5 text-red-400 mr-3" />
+                                                    <div>
+                                                        <div className="font-medium">VPS</div>
+                                                        <div className="text-sm text-white/50">Virtual Private Server</div>
+                                                    </div>
+                                                </a>
+                                                <a href="#" className="flex items-center px-4 py-3 text-white/70 hover:text-white hover:bg-white/5 rounded-lg transition-colors">
+                                                    <ServerIcon className="w-5 h-5 text-orange-400 mr-3" />
+                                                    <div>
+                                                        <div className="font-medium">Dedicated Server</div>
+                                                        <div className="text-sm text-white/50">Server khusus untuk Anda</div>
+                                                    </div>
+                                                </a>
+                                            </div>
+                                        )}
+                                    </div>
+
+                                    {/* Tunneling */}
+                                    <div>
+                                        <button 
+                                            className="flex items-center justify-between w-full text-white/80 hover:text-white py-3 px-4 rounded-lg hover:bg-white/10 transition-all duration-300 font-medium"
+                                            onClick={() => setActiveDropdown(activeDropdown === 'tunneling-mobile' ? null : 'tunneling-mobile')}
+                                        >
+                                            <span>Tunneling</span>
+                                            <ChevronDownIcon className={`w-4 h-4 transition-transform duration-200 ${activeDropdown === 'tunneling-mobile' ? 'rotate-180' : ''}`} />
+                                        </button>
+                                        {activeDropdown === 'tunneling-mobile' && (
+                                            <div className="ml-4 mt-2 space-y-2">
+                                                <a href="#" className="flex items-center px-4 py-3 text-white/70 hover:text-white hover:bg-white/5 rounded-lg transition-colors">
+                                                    <ShieldCheckIcon className="w-5 h-5 text-green-400 mr-3" />
+                                                    <div>
+                                                        <div className="font-medium">Secure Tunnel</div>
+                                                        <div className="text-sm text-white/50">Koneksi aman dan terenkripsi</div>
+                                                    </div>
+                                                </a>
+                                                <a href="#" className="flex items-center px-4 py-3 text-white/70 hover:text-white hover:bg-white/5 rounded-lg transition-colors">
+                                                    <RocketLaunchIcon className="w-5 h-5 text-blue-400 mr-3" />
+                                                    <div>
+                                                        <div className="font-medium">Fast Tunnel</div>
+                                                        <div className="text-sm text-white/50">Akses cepat tanpa batas</div>
+                                                    </div>
+                                                </a>
+                                            </div>
+                                        )}
+                                    </div>
+
+                                    {/* Website */}
+                                    <div>
+                                        <button 
+                                            className="flex items-center justify-between w-full text-white/80 hover:text-white py-3 px-4 rounded-lg hover:bg-white/10 transition-all duration-300 font-medium"
+                                            onClick={() => setActiveDropdown(activeDropdown === 'website-mobile' ? null : 'website-mobile')}
+                                        >
+                                            <span>Website</span>
+                                            <ChevronDownIcon className={`w-4 h-4 transition-transform duration-200 ${activeDropdown === 'website-mobile' ? 'rotate-180' : ''}`} />
+                                        </button>
+                                        {activeDropdown === 'website-mobile' && (
+                                            <div className="ml-4 mt-2 space-y-2">
+                                                <a href="#" className="flex items-center px-4 py-3 text-white/70 hover:text-white hover:bg-white/5 rounded-lg transition-colors">
+                                                    <ComputerDesktopIcon className="w-5 h-5 text-blue-400 mr-3" />
+                                                    <div>
+                                                        <div className="font-medium">Website Builder</div>
+                                                        <div className="text-sm text-white/50">Drag & drop website builder</div>
+                                                    </div>
+                                                </a>
+                                                <a href="#" className="flex items-center px-4 py-3 text-white/70 hover:text-white hover:bg-white/5 rounded-lg transition-colors">
+                                                    <GlobeAltIcon className="w-5 h-5 text-purple-400 mr-3" />
+                                                    <div>
+                                                        <div className="font-medium">Template Premium</div>
+                                                        <div className="text-sm text-white/50">Template siap pakai</div>
+                                                    </div>
+                                                </a>
+                                            </div>
+                                        )}
+                                    </div>
+
+                                    {/* Aplikasi */}
+                                    <div>
+                                        <button 
+                                            className="flex items-center justify-between w-full text-white/80 hover:text-white py-3 px-4 rounded-lg hover:bg-white/10 transition-all duration-300 font-medium"
+                                            onClick={() => setActiveDropdown(activeDropdown === 'aplikasi-mobile' ? null : 'aplikasi-mobile')}
+                                        >
+                                            <span>Aplikasi</span>
+                                            <ChevronDownIcon className={`w-4 h-4 transition-transform duration-200 ${activeDropdown === 'aplikasi-mobile' ? 'rotate-180' : ''}`} />
+                                        </button>
+                                        {activeDropdown === 'aplikasi-mobile' && (
+                                            <div className="ml-4 mt-2 space-y-2">
+                                                <a href="#" className="flex items-center px-4 py-3 text-white/70 hover:text-white hover:bg-white/5 rounded-lg transition-colors">
+                                                    <DevicePhoneMobileIcon className="w-5 h-5 text-green-400 mr-3" />
+                                                    <div>
+                                                        <div className="font-medium">Mobile App</div>
+                                                        <div className="text-sm text-white/50">Kelola hosting dari HP</div>
+                                                    </div>
+                                                </a>
+                                                <a href="#" className="flex items-center px-4 py-3 text-white/70 hover:text-white hover:bg-white/5 rounded-lg transition-colors">
+                                                    <ChartBarIcon className="w-5 h-5 text-blue-400 mr-3" />
+                                                    <div>
+                                                        <div className="font-medium">Analytics</div>
+                                                        <div className="text-sm text-white/50">Monitor performa website</div>
+                                                    </div>
+                                                </a>
+                                            </div>
+                                        )}
+                                    </div>
+
+                                    {/* About */}
+                                    <a href="#about" className="block text-white/80 hover:text-white py-3 px-4 rounded-lg hover:bg-white/10 transition-all duration-300 font-medium">
+                                        About
+                                    </a>
+                                </div>
+
+                                {/* Mobile Auth Buttons */}
+                                <div className="pt-4 border-t border-white/20 space-y-3">
+                                    {auth.user ? (
+                                        <Link
+                                            href={route('dashboard')}
+                                            className="block w-full bg-gradient-to-r from-cyan-500 to-blue-600 text-white px-6 py-3 rounded-lg font-medium hover:from-cyan-600 hover:to-blue-700 transition-all duration-200 text-center"
+                                        >
+                                            Dashboard
+                                        </Link>
+                                    ) : (
+                                        <>
+                                            <Link
+                                                href={route('login')}
+                                                className="block w-full text-white/80 hover:text-white px-6 py-3 rounded-lg font-medium transition-colors duration-200 text-center border border-white/20 hover:border-white/40"
+                                            >
+                                                Masuk
+                                            </Link>
+                                            <Link
+                                                href={route('register')}
+                                                className="block w-full bg-gradient-to-r from-cyan-500 to-blue-600 text-white px-6 py-3 rounded-lg font-medium hover:from-cyan-600 hover:to-blue-700 transition-all duration-200 text-center"
+                                            >
+                                                Daftar Gratis
+                                            </Link>
+                                        </>
+                                    )}
+                                </div>
+                            </div>
+                        </div>
+                    )}
                 </nav>
 
                 {/* Hero Section */}
-                <div className="relative z-10 pt-32 pb-32 overflow-hidden">
-                    {/* Animated Background Elements */}
+                <div className="relative bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 pt-20 pb-16 lg:pt-32 lg:pb-24 overflow-hidden">
+                    {/* Background pattern */}
+                    <div className="absolute inset-0 opacity-50">
+                        <div className="absolute inset-0 bg-gradient-to-r from-blue-500/5 to-cyan-500/5"></div>
+                        <div className="absolute inset-0" style={{
+                            backgroundImage: `radial-gradient(circle at 1px 1px, rgba(255,255,255,0.15) 1px, transparent 0)`,
+                            backgroundSize: '20px 20px'
+                        }}></div>
+                    </div>
+
+                    {/* Floating background elements */}
                     <div className="absolute inset-0 overflow-hidden">
-                        {/* Floating Orbs */}
-                        <div className="absolute top-1/4 left-1/4 w-32 h-32 bg-gradient-to-r from-cyan-400/20 to-blue-500/20 rounded-full blur-xl animate-pulse"></div>
-                        <div className="absolute top-3/4 right-1/4 w-24 h-24 bg-gradient-to-r from-purple-400/20 to-pink-500/20 rounded-full blur-xl animate-pulse delay-1000"></div>
-                        <div className="absolute top-1/2 left-3/4 w-20 h-20 bg-gradient-to-r from-green-400/20 to-cyan-500/20 rounded-full blur-xl animate-pulse delay-2000"></div>
-                        
-                        {/* Animated Grid Lines */}
-                        <div className="absolute inset-0 opacity-10">
-                            <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-cyan-500 to-transparent animate-pulse"></div>
-                            <div className="absolute top-1/3 left-0 w-full h-px bg-gradient-to-r from-transparent via-blue-500 to-transparent animate-pulse delay-500"></div>
-                            <div className="absolute top-2/3 left-0 w-full h-px bg-gradient-to-r from-transparent via-purple-500 to-transparent animate-pulse delay-1000"></div>
-                        </div>
-                        
-                        {/* Particle Effects */}
-                        <div className="absolute top-10 left-10 w-2 h-2 bg-cyan-400 rounded-full animate-bounce"></div>
-                        <div className="absolute top-20 right-20 w-1 h-1 bg-blue-400 rounded-full animate-bounce delay-300"></div>
-                        <div className="absolute bottom-20 left-20 w-1.5 h-1.5 bg-purple-400 rounded-full animate-bounce delay-700"></div>
-                        <div className="absolute bottom-10 right-10 w-1 h-1 bg-pink-400 rounded-full animate-bounce delay-1000"></div>
-                        <div className="absolute top-1/2 left-5 w-1 h-1 bg-green-400 rounded-full animate-bounce delay-1500"></div>
-                        <div className="absolute top-1/3 right-5 w-1.5 h-1.5 bg-cyan-300 rounded-full animate-bounce delay-2000"></div>
+                        <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-blue-500/10 rounded-full blur-3xl animate-pulse"></div>
+                        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-cyan-500/10 rounded-full blur-3xl animate-pulse delay-1000"></div>
+                        <div className="absolute top-1/2 left-1/2 w-32 h-32 bg-purple-500/10 rounded-full blur-2xl animate-bounce"></div>
                     </div>
                     
-                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+                    <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                         <div className="grid lg:grid-cols-2 gap-12 items-center">
                             {/* Left Content */}
-                            <div className="text-center lg:text-left relative">
-                                {/* Badge with enhanced styling */}
-                                <div className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-cyan-500/30 via-blue-500/30 to-purple-500/30 rounded-full border border-cyan-400/40 mb-8 backdrop-blur-sm shadow-lg shadow-cyan-500/20 hover:shadow-cyan-500/30 transition-all duration-300">
-                                    <StarIcon className="w-5 h-5 text-cyan-300 mr-3 animate-pulse" />
-                                    <span className="text-cyan-200 text-sm font-semibold tracking-wide">Trusted by 15,000+ Developers</span>
-                                    <div className="absolute inset-0 bg-gradient-to-r from-cyan-400/10 to-purple-400/10 rounded-full animate-pulse"></div>
+                            <div className="text-center lg:text-left">
+                                {/* Badge */}
+                                <div className="inline-flex items-center px-4 py-2 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-300 text-sm font-medium mb-8 animate-fade-in">
+                                    <span className="w-2 h-2 bg-green-400 rounded-full mr-2 animate-pulse"></span>
+                                    Trusted by 10,000+ developers worldwide
                                 </div>
-                                
-                                {/* Enhanced heading with multiple gradients and effects */}
-                                <h1 className="text-5xl lg:text-7xl font-bold mb-6 leading-tight relative">
-                                    <span className="block text-white drop-shadow-lg hover:drop-shadow-2xl transition-all duration-300">Next-Gen</span>
-                                    <span className="block bg-gradient-to-r from-cyan-300 via-blue-400 via-purple-500 to-pink-500 bg-clip-text text-transparent animate-pulse drop-shadow-2xl">
-                                        Hosting
-                                    </span>
-                                    <span className="block bg-gradient-to-r from-white via-cyan-100 to-blue-100 bg-clip-text text-transparent drop-shadow-lg">Platform</span>
-                                    
-                                    {/* Text glow effect */}
-                                    <div className="absolute inset-0 bg-gradient-to-r from-cyan-400/20 via-blue-500/20 to-purple-600/20 blur-3xl -z-10 animate-pulse"></div>
+
+                                {/* Main heading */}
+                                <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-6 leading-tight animate-slide-up">
+                                    Dari Website <span className="bg-gradient-to-r from-pink-400 to-purple-500 bg-clip-text text-transparent">Pribadi</span> hingga{' '}
+                                    <span className="bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">Perusahaan</span>
                                 </h1>
-                                
-                                {/* Enhanced description with better styling */}
-                                <p className="text-xl text-white/80 mb-8 max-w-2xl leading-relaxed font-light">
-                                    <span className="bg-gradient-to-r from-white via-cyan-100 to-blue-100 bg-clip-text text-transparent">
-                                        Revolusioner dalam teknologi hosting dan tunneling dengan 
-                                    </span>
-                                    <span className="text-cyan-300 font-medium"> AI-powered infrastructure</span>, 
-                                    <span className="text-blue-300 font-medium"> real-time analytics</span>, dan 
-                                    <span className="text-purple-300 font-medium"> security tingkat enterprise </span>
-                                    <span className="bg-gradient-to-r from-white via-cyan-100 to-blue-100 bg-clip-text text-transparent">
-                                        untuk masa depan digital Anda.
-                                    </span>
+
+                                {/* Subtitle */}
+                                <p className="text-xl text-gray-300 mb-8 leading-relaxed animate-slide-up delay-200">
+                                    Hosting berkualitas tinggi dengan performa maksimal, keamanan terdepan, dan dukungan 24/7. 
+                                    Mulai dari Rp 15.000/bulan.
                                 </p>
-                                
-                                {/* Enhanced buttons with better effects */}
-                                <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
-                                    <Link
-                                        href={auth.user ? route('dashboard') : route('register')}
-                                        className="group relative bg-gradient-to-r from-cyan-500 via-blue-600 to-purple-600 text-white px-8 py-4 rounded-xl font-semibold hover:from-cyan-400 hover:via-blue-500 hover:to-purple-500 transition-all duration-300 transform hover:scale-105 hover:-translate-y-1 shadow-2xl shadow-cyan-500/30 hover:shadow-cyan-500/50 hover:shadow-2xl flex items-center justify-center overflow-hidden animate-pulse-glow"
-                                    >
-                                        <div className="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 animate-shimmer"></div>
-                                        <div className="absolute inset-0 bg-gradient-to-r from-cyan-400/20 via-blue-500/20 to-purple-600/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500 blur-xl"></div>
-                                        <span className="relative z-10 group-hover:text-white transition-colors duration-300">{auth.user ? 'Ke Dashboard' : 'Mulai Gratis'}</span>
-                                        <ArrowRightIcon className="relative z-10 w-5 h-5 ml-2 group-hover:translate-x-2 group-hover:scale-110 transition-all duration-300" />
+
+                                {/* CTA Section */}
+                                <div className="mb-12 animate-slide-up delay-300">
+                                    <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start items-center mb-6">
+                                        <Link
+                                            href="/register"
+                                            className="bg-gradient-to-r from-cyan-500 to-blue-600 text-white px-8 py-4 rounded-lg font-semibold text-lg hover:from-cyan-600 hover:to-blue-700 transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-cyan-500/25"
+                                        >
+                                            Mulai Gratis Sekarang
+                                        </Link>
                                         
-                                        {/* Button particles */}
-                                        <div className="absolute top-0 left-0 w-2 h-2 bg-white/60 rounded-full opacity-0 group-hover:opacity-100 group-hover:animate-ping" style={{animationDelay: '0.1s'}}></div>
-                                        <div className="absolute bottom-0 right-0 w-1 h-1 bg-cyan-300/80 rounded-full opacity-0 group-hover:opacity-100 group-hover:animate-ping" style={{animationDelay: '0.3s'}}></div>
-                                    </Link>
-                                    <button className="group relative bg-white/10 backdrop-blur-sm text-white px-8 py-4 rounded-xl font-semibold hover:bg-white/20 transition-all duration-300 border border-white/30 hover:border-white/50 hover:border-cyan-400/50 flex items-center justify-center shadow-lg hover:shadow-xl hover:-translate-y-1 overflow-hidden glass-effect">
-                                        <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/10 to-purple-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                                        <div className="absolute inset-0 bg-gradient-to-r from-white/5 to-cyan-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500 animate-shimmer"></div>
-                                        <PlayIcon className="relative z-10 w-5 h-5 mr-2 group-hover:scale-110 group-hover:text-cyan-300 transition-all duration-300" />
-                                        <span className="relative z-10 group-hover:text-cyan-100 transition-colors duration-300">Watch Demo</span>
-                                        
-                                        {/* Button glow */}
-                                        <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-cyan-400/0 via-blue-400/0 to-purple-400/0 group-hover:from-cyan-400/20 group-hover:via-blue-400/20 group-hover:to-purple-400/20 transition-all duration-500 blur-sm"></div>
-                                    </button>
+                                        <Link
+                                            href="/hosting-packages"
+                                            className="text-white px-8 py-4 rounded-lg font-semibold text-lg border border-white/20 hover:border-white/40 transition-all duration-300 hover:bg-white/5"
+                                        >
+                                            Lihat Paket Hosting
+                                        </Link>
+                                    </div>
+                                    
+                                    <p className="text-sm text-gray-400">
+                                        ✓ Domain gratis ✓ SSL gratis ✓ Migrasi gratis ✓ Garansi uptime 99.9%
+                                    </p>
                                 </div>
-                                
-                                {/* Interactive floating elements around text */}
-                                <div className="absolute -top-10 -left-10 w-20 h-20 border border-cyan-400/20 rounded-full animate-spin opacity-30" style={{animationDuration: '20s'}}></div>
-                                <div className="absolute -bottom-10 -right-10 w-16 h-16 border border-purple-400/20 rounded-full animate-spin opacity-30" style={{animationDuration: '15s', animationDirection: 'reverse'}}></div>
-                                <div className="absolute top-1/2 -left-20 w-4 h-4 bg-blue-400/30 rounded-full animate-bounce" style={{animationDelay: '1s'}}></div>
-                                <div className="absolute top-1/4 -right-16 w-3 h-3 bg-cyan-400/40 rounded-full animate-pulse" style={{animationDelay: '2s'}}></div>
+
+                                {/* Trust indicators */}
+                                <div className="grid grid-cols-2 md:grid-cols-4 gap-6 animate-slide-up delay-500">
+                                    <div className="text-center lg:text-left">
+                                        <div className="text-2xl md:text-3xl font-bold text-white mb-1">99.9%</div>
+                                        <div className="text-gray-400 text-sm">Uptime Guarantee</div>
+                                    </div>
+                                    <div className="text-center lg:text-left">
+                                        <div className="text-2xl md:text-3xl font-bold text-white mb-1">24/7</div>
+                                        <div className="text-gray-400 text-sm">Expert Support</div>
+                                    </div>
+                                    <div className="text-center lg:text-left">
+                                        <div className="text-2xl md:text-3xl font-bold text-white mb-1">10K+</div>
+                                        <div className="text-gray-400 text-sm">Happy Customers</div>
+                                    </div>
+                                    <div className="text-center lg:text-left">
+                                        <div className="text-2xl md:text-3xl font-bold text-white mb-1">Free</div>
+                                        <div className="text-gray-400 text-sm">SSL & Domain</div>
+                                    </div>
+                                </div>
                             </div>
 
-                            {/* Right Content - SVG Illustration */}
-                            <div className="relative flex items-center justify-center h-full min-h-[600px]">
-                                {/* Glow Background */}
-                                <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/10 via-blue-500/10 to-purple-500/10 rounded-3xl blur-3xl animate-pulse"></div>
+                            {/* Right Content - Hero Image */}
+                            <div className="relative flex justify-center lg:justify-end">
+                                {/* Decorative elements */}
+                                <div className="absolute inset-0 flex items-center justify-center">
+                                    <div className="w-96 h-96 bg-gradient-to-r from-cyan-500/20 to-blue-500/20 rounded-full blur-3xl animate-pulse"></div>
+                                </div>
                                 
-                                {/* AbahWeb SVG Illustration */}
-                                <div className="relative group h-full w-full flex items-center justify-center">
-                                    {/* SVG Glow Effect */}
-                                    <div className="absolute inset-0 bg-gradient-to-r from-cyan-400/20 via-blue-500/20 to-purple-600/20 rounded-2xl blur-2xl group-hover:blur-xl transition-all duration-700"></div>
-                                    
+                                {/* Floating elements around the image */}
+                                <div className="absolute top-10 left-10 w-16 h-16 bg-gradient-to-r from-cyan-400 to-blue-500 rounded-2xl animate-float shadow-lg shadow-cyan-500/50 flex items-center justify-center">
+                                    <ServerIcon className="w-8 h-8 text-white" />
+                                </div>
+                                
+                                <div className="absolute top-20 right-10 w-12 h-12 bg-gradient-to-r from-purple-400 to-pink-500 rounded-xl animate-float delay-1000 shadow-lg shadow-purple-500/50 flex items-center justify-center">
+                                    <ShieldCheckIcon className="w-6 h-6 text-white" />
+                                </div>
+                                
+                                <div className="absolute bottom-20 left-5 w-14 h-14 bg-gradient-to-r from-green-400 to-emerald-500 rounded-2xl animate-float delay-500 shadow-lg shadow-green-500/50 flex items-center justify-center">
+                                    <RocketLaunchIcon className="w-7 h-7 text-white" />
+                                </div>
+                                
+                                <div className="absolute bottom-10 right-5 w-10 h-10 bg-gradient-to-r from-orange-400 to-red-500 rounded-lg animate-float delay-1500 shadow-lg shadow-orange-500/50 flex items-center justify-center">
+                                    <GlobeAltIcon className="w-5 h-5 text-white" />
+                                </div>
+
+                                {/* Main SVG Image */}
+                                <div className="relative z-10 max-w-lg w-full animate-fade-in-scale">
                                     <img 
                                         src="/images/abahweb_depan_svg.svg" 
-                                        alt="AbahWeb Hosting & Tunneling Platform" 
-                                        className="relative z-10 w-full h-full max-w-none max-h-[580px] object-contain group-hover:scale-105 transition-all duration-700"
+                                        alt="AbahWeb Hosting Illustration" 
+                                        className="w-full h-auto animate-gentle-bounce"
                                         style={{
-                                            filter: 'drop-shadow(0 25px 50px rgba(6, 182, 212, 0.4)) drop-shadow(0 0 30px rgba(59, 130, 246, 0.3)) drop-shadow(0 0 60px rgba(147, 51, 234, 0.2))'
+                                            filter: 'drop-shadow(0 25px 50px rgba(59, 130, 246, 0.3))'
                                         }}
                                     />
-                                    
-                                    {/* Rotating Ring */}
-                                    <div className="absolute inset-0 border-2 border-gradient-to-r from-cyan-400/30 via-blue-500/30 to-purple-600/30 rounded-full animate-spin" style={{animationDuration: '20s'}}></div>
                                 </div>
-                                
-                                {/* Enhanced Floating Elements */}
-                                <div className="absolute -top-6 -right-6 w-12 h-12 bg-gradient-to-r from-pink-400 to-red-500 rounded-full animate-bounce shadow-lg shadow-pink-500/50">
-                                    <div className="absolute inset-2 bg-white/20 rounded-full animate-pulse"></div>
-                                </div>
-                                <div className="absolute -bottom-6 -left-6 w-10 h-10 bg-gradient-to-r from-green-400 to-cyan-500 rounded-full animate-bounce delay-1000 shadow-lg shadow-green-500/50">
-                                    <div className="absolute inset-2 bg-white/20 rounded-full animate-pulse delay-500"></div>
-                                </div>
-                                <div className="absolute top-1/4 -right-8 w-6 h-6 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-full animate-bounce delay-500 shadow-lg shadow-yellow-500/50"></div>
-                                <div className="absolute bottom-1/4 -left-8 w-8 h-8 bg-gradient-to-r from-purple-400 to-indigo-500 rounded-full animate-bounce delay-1500 shadow-lg shadow-purple-500/50"></div>
-                                
-                                {/* Orbiting Elements */}
-                                <div className="absolute inset-0 animate-spin" style={{animationDuration: '30s'}}>
-                                    <div className="absolute top-0 left-1/2 w-3 h-3 bg-cyan-400 rounded-full shadow-lg shadow-cyan-400/50 transform -translate-x-1/2"></div>
-                                </div>
-                                <div className="absolute inset-0 animate-spin" style={{animationDuration: '25s', animationDirection: 'reverse'}}>
-                                    <div className="absolute bottom-0 left-1/2 w-2 h-2 bg-blue-400 rounded-full shadow-lg shadow-blue-400/50 transform -translate-x-1/2"></div>
-                                </div>
+
+                                {/* Glowing orbs */}
+                                <div className="absolute top-1/4 right-1/4 w-4 h-4 bg-cyan-400 rounded-full animate-ping"></div>
+                                <div className="absolute bottom-1/3 left-1/3 w-3 h-3 bg-blue-400 rounded-full animate-ping delay-700"></div>
+                                <div className="absolute top-1/2 right-1/3 w-2 h-2 bg-purple-400 rounded-full animate-ping delay-1000"></div>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                {/* Stats Section */}
-                <div id="stats" className="relative z-10 py-20 bg-white/5 backdrop-blur-sm border-y border-white/10">
+                {/* Hosting Packages Section */}
+                <div className="py-16 lg:py-24 bg-white">
                     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                        <div className="grid grid-cols-2 lg:grid-cols-4 gap-8">
-                            <div className="text-center">
-                                <div className="text-4xl lg:text-5xl font-bold bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent mb-2">
-                                    {stats.users.toLocaleString()}+
+                        <div className="text-center mb-16">
+                            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+                                Paket Hosting Terbaik untuk Setiap Kebutuhan
+                            </h2>
+                            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+                                Pilih paket hosting yang sesuai dengan kebutuhan website Anda. 
+                                Semua paket dilengkapi dengan fitur premium dan dukungan 24/7.
+                            </p>
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 max-w-7xl mx-auto">
+                            {hostingPackages.map((pkg, index) => {
+                                // Determine if this package should be highlighted
+                                const isPopular = pkg.badge === 'Popular' || pkg.badge === 'Most Popular';
+                                const isPremium = pkg.badge === 'Premium';
+                                
+                                // Dynamic styling based on package type
+                                const cardClasses = isPopular 
+                                    ? "relative bg-gradient-to-br from-blue-50 to-cyan-50 rounded-2xl border-2 border-blue-500 p-8 hover:shadow-xl transition-all duration-300 transform scale-105"
+                                    : isPremium
+                                    ? "relative bg-gradient-to-br from-purple-50 to-indigo-50 rounded-2xl border-2 border-purple-500 p-8 hover:shadow-xl transition-all duration-300"
+                                    : "relative bg-white rounded-2xl border border-gray-200 p-8 hover:shadow-xl transition-all duration-300";
+                                
+                                const buttonClasses = isPopular
+                                    ? "w-full bg-gradient-to-r from-blue-500 to-cyan-500 text-white py-3 px-6 rounded-lg font-semibold hover:from-blue-600 hover:to-cyan-600 transition-all duration-300 inline-block text-center"
+                                    : isPremium
+                                    ? "w-full bg-gradient-to-r from-purple-500 to-indigo-500 text-white py-3 px-6 rounded-lg font-semibold hover:from-purple-600 hover:to-indigo-600 transition-all duration-300 inline-block text-center"
+                                    : "w-full bg-gray-900 text-white py-3 px-6 rounded-lg font-semibold hover:bg-gray-800 transition-colors duration-300 inline-block text-center";
+
+                                return (
+                                    <div key={pkg.id} className={cardClasses}>
+                                        {/* Badge for popular/premium packages */}
+                                        {pkg.badge && (
+                                            <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
+                                                <span className={`px-4 py-2 rounded-full text-sm font-semibold ${
+                                                    isPopular 
+                                                        ? 'bg-gradient-to-r from-blue-500 to-cyan-500 text-white'
+                                                        : isPremium
+                                                        ? 'bg-gradient-to-r from-purple-500 to-indigo-500 text-white'
+                                                        : 'bg-gray-900 text-white'
+                                                }`}>
+                                                    {pkg.badge}
+                                                </span>
+                                            </div>
+                                        )}
+                                        
+                                        {/* Package Image */}
+                                        {pkg.image && (
+                                            <div className="text-center mb-6">
+                                                <img 
+                                                    src={`/images/${pkg.image}`} 
+                                                    alt={pkg.name}
+                                                    className="w-16 h-16 mx-auto object-contain"
+                                                />
+                                            </div>
+                                        )}
+                                        
+                                        <div className="text-center">
+                                            <h3 className="text-xl font-bold text-gray-900 mb-2">{pkg.name}</h3>
+                                            <p className="text-gray-600 mb-6">{pkg.description}</p>
+                                            <div className="mb-6">
+                                                <span className="text-4xl font-bold text-gray-900">
+                                                    Rp {new Intl.NumberFormat('id-ID').format(pkg.price)}
+                                                </span>
+                                                <span className="text-gray-600">/{pkg.billing_cycle}</span>
+                                            </div>
+                                            <Link
+                                                href="/register"
+                                                className={buttonClasses}
+                                            >
+                                                Pilih Paket
+                                            </Link>
+                                        </div>
+                                        
+                                        {/* Features */}
+                                        <div className="mt-8 space-y-4">
+                                            {/* Storage */}
+                                            <div className="flex items-center">
+                                                <svg className="w-5 h-5 text-green-500 mr-3" fill="currentColor" viewBox="0 0 20 20">
+                                                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                                                </svg>
+                                                <span className="text-gray-700">
+                                                    {pkg.storage_gb === -1 ? 'Unlimited' : `${pkg.storage_gb} GB`} SSD Storage
+                                                </span>
+                                            </div>
+                                            
+                                            {/* Domains */}
+                                            <div className="flex items-center">
+                                                <svg className="w-5 h-5 text-green-500 mr-3" fill="currentColor" viewBox="0 0 20 20">
+                                                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                                                </svg>
+                                                <span className="text-gray-700">
+                                                    {pkg.domains === -1 ? 'Unlimited' : pkg.domains} Website{pkg.domains !== 1 ? 's' : ''}
+                                                </span>
+                                            </div>
+                                            
+                                            {/* Email Accounts */}
+                                            <div className="flex items-center">
+                                                <svg className="w-5 h-5 text-green-500 mr-3" fill="currentColor" viewBox="0 0 20 20">
+                                                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                                                </svg>
+                                                <span className="text-gray-700">
+                                                    {pkg.email_accounts === -1 ? 'Unlimited' : pkg.email_accounts} Email Account{pkg.email_accounts !== 1 ? 's' : ''}
+                                                </span>
+                                            </div>
+                                            
+                                            {/* SSL Certificate */}
+                                            {pkg.ssl_certificate && (
+                                                <div className="flex items-center">
+                                                    <svg className="w-5 h-5 text-green-500 mr-3" fill="currentColor" viewBox="0 0 20 20">
+                                                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                                                    </svg>
+                                                    <span className="text-gray-700">Free SSL Certificate</span>
+                                                </div>
+                                            )}
+                                            
+                                            {/* Support */}
+                                            {pkg.support_24_7 && (
+                                                <div className="flex items-center">
+                                                    <svg className="w-5 h-5 text-green-500 mr-3" fill="currentColor" viewBox="0 0 20 20">
+                                                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                                                    </svg>
+                                                    <span className="text-gray-700">24/7 Support</span>
+                                                </div>
+                                            )}
+                                            
+                                            {/* Additional Features from JSON */}
+                                            {pkg.features && pkg.features.slice(0, 2).map((feature, featureIndex) => (
+                                                <div key={featureIndex} className="flex items-center">
+                                                    <svg className="w-5 h-5 text-green-500 mr-3" fill="currentColor" viewBox="0 0 20 20">
+                                                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                                                    </svg>
+                                                    <span className="text-gray-700">{feature}</span>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                );
+                            })}
+                        </div>
+
+                        {/* Additional features */}
+                        <div className="mt-16 text-center">
+                            <p className="text-gray-600 mb-8">Semua paket hosting dilengkapi dengan:</p>
+                            <div className="grid grid-cols-2 md:grid-cols-4 gap-6 max-w-4xl mx-auto">
+                                <div className="flex flex-col items-center">
+                                    <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mb-3">
+                                        <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                        </svg>
+                                    </div>
+                                    <span className="text-sm font-medium text-gray-700">99.9% Uptime</span>
                                 </div>
-                                <div className="text-white/60 font-medium">Active Users</div>
-                            </div>
-                            <div className="text-center">
-                                <div className="text-4xl lg:text-5xl font-bold bg-gradient-to-r from-purple-400 to-pink-500 bg-clip-text text-transparent mb-2">
-                                    {stats.servers}+
+                                <div className="flex flex-col items-center">
+                                    <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mb-3">
+                                        <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                                        </svg>
+                                    </div>
+                                    <span className="text-sm font-medium text-gray-700">SSL Gratis</span>
                                 </div>
-                                <div className="text-white/60 font-medium">Servers</div>
-                            </div>
-                            <div className="text-center">
-                                <div className="text-4xl lg:text-5xl font-bold bg-gradient-to-r from-green-400 to-cyan-500 bg-clip-text text-transparent mb-2">
-                                    {stats.uptime}%
+                                <div className="flex flex-col items-center">
+                                    <div className="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center mb-3">
+                                        <svg className="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                                        </svg>
+                                    </div>
+                                    <span className="text-sm font-medium text-gray-700">SSD Speed</span>
                                 </div>
-                                <div className="text-white/60 font-medium">Uptime</div>
-                            </div>
-                            <div className="text-center">
-                                <div className="text-4xl lg:text-5xl font-bold bg-gradient-to-r from-orange-400 to-red-500 bg-clip-text text-transparent mb-2">
-                                    {stats.countries}+
+                                <div className="flex flex-col items-center">
+                                    <div className="w-12 h-12 bg-orange-100 rounded-full flex items-center justify-center mb-3">
+                                        <svg className="w-6 h-6 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192L5.636 18.364M12 3v6m0 6v6m6-12h-6m-6 0h6" />
+                                        </svg>
+                                    </div>
+                                    <span className="text-sm font-medium text-gray-700">24/7 Support</span>
                                 </div>
-                                <div className="text-white/60 font-medium">Countries</div>
                             </div>
                         </div>
                     </div>
                 </div>
 
                 {/* Features Section */}
-                <div id="features" className="relative z-10 py-32">
+                <div className="py-16 lg:py-24 bg-gray-50">
                     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                        <div className="text-center mb-20">
-                            <h2 className="text-4xl lg:text-5xl font-bold text-white mb-6">
-                                Fitur <span className="bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">Revolusioner</span>
+                        <div className="text-center mb-16">
+                            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+                                Mengapa Memilih AbahWeb?
                             </h2>
-                            <p className="text-xl text-white/70 max-w-3xl mx-auto">
-                                Teknologi terdepan yang dirancang untuk mengoptimalkan performa, keamanan, dan skalabilitas infrastruktur digital Anda
+                            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+                                Kami menyediakan solusi hosting terlengkap dengan teknologi terdepan 
+                                dan dukungan terbaik untuk kesuksesan website Anda.
                             </p>
                         </div>
 
-                        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-                            {features.map((feature, index) => (
-                                <div key={feature.name} className="group relative">
-                                    <div className="relative bg-white/10 backdrop-blur-xl rounded-2xl border border-white/20 p-8 hover:bg-white/15 transition-all duration-300 transform hover:scale-105 hover:shadow-2xl">
-                                        <div className={`w-16 h-16 bg-gradient-to-r ${feature.gradient} rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300`}>
-                                            <feature.icon className="w-8 h-8 text-white" />
-                                        </div>
-                                        
-                                        <h3 className="text-xl font-bold text-white mb-4">{feature.name}</h3>
-                                        <p className="text-white/70 mb-4 leading-relaxed">{feature.description}</p>
-                                        
-                                        <div className="flex items-center justify-between">
-                                            <span className="text-sm font-medium text-cyan-400">{feature.stats}</span>
-                                            <ArrowRightIcon className="w-5 h-5 text-white/40 group-hover:text-cyan-400 group-hover:translate-x-1 transition-all duration-300" />
-                                        </div>
-                                    </div>
+                        {/* Main Features Grid */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
+                            <div className="bg-white rounded-2xl p-8 shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100">
+                                <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-2xl flex items-center justify-center mb-6">
+                                    <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                                    </svg>
                                 </div>
-                            ))}
+                                <h3 className="text-xl font-bold text-gray-900 mb-4">Performa Lightning Fast</h3>
+                                <p className="text-gray-600 mb-6">
+                                    Server SSD NVMe dengan teknologi LiteSpeed dan CDN global untuk kecepatan loading website hingga 3x lebih cepat.
+                                </p>
+                                <ul className="space-y-2 text-sm text-gray-600">
+                                    <li className="flex items-center">
+                                        <svg className="w-4 h-4 text-green-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                                        </svg>
+                                        SSD NVMe Storage
+                                    </li>
+                                    <li className="flex items-center">
+                                        <svg className="w-4 h-4 text-green-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                                        </svg>
+                                        LiteSpeed Web Server
+                                    </li>
+                                    <li className="flex items-center">
+                                        <svg className="w-4 h-4 text-green-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                                        </svg>
+                                        Global CDN
+                                    </li>
+                                </ul>
+                            </div>
+
+                            <div className="bg-white rounded-2xl p-8 shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100">
+                                <div className="w-16 h-16 bg-gradient-to-br from-green-500 to-emerald-500 rounded-2xl flex items-center justify-center mb-6">
+                                    <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                                    </svg>
+                                </div>
+                                <h3 className="text-xl font-bold text-gray-900 mb-4">Keamanan Maksimal</h3>
+                                <p className="text-gray-600 mb-6">
+                                    Perlindungan berlapis dengan firewall canggih, SSL gratis, dan backup otomatis harian untuk menjaga data Anda.
+                                </p>
+                                <ul className="space-y-2 text-sm text-gray-600">
+                                    <li className="flex items-center">
+                                        <svg className="w-4 h-4 text-green-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                                        </svg>
+                                        SSL Certificate Gratis
+                                    </li>
+                                    <li className="flex items-center">
+                                        <svg className="w-4 h-4 text-green-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                                        </svg>
+                                        Advanced Firewall
+                                    </li>
+                                    <li className="flex items-center">
+                                        <svg className="w-4 h-4 text-green-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                                        </svg>
+                                        Daily Backup
+                                    </li>
+                                </ul>
+                            </div>
+
+                            <div className="bg-white rounded-2xl p-8 shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100">
+                                <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-pink-500 rounded-2xl flex items-center justify-center mb-6">
+                                    <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192L5.636 18.364M12 3v6m0 6v6m6-12h-6m-6 0h6" />
+                                    </svg>
+                                </div>
+                                <h3 className="text-xl font-bold text-gray-900 mb-4">Support Expert 24/7</h3>
+                                <p className="text-gray-600 mb-6">
+                                    Tim support berpengalaman siap membantu Anda kapan saja melalui live chat, email, atau telepon dalam bahasa Indonesia.
+                                </p>
+                                <ul className="space-y-2 text-sm text-gray-600">
+                                    <li className="flex items-center">
+                                        <svg className="w-4 h-4 text-green-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                                        </svg>
+                                        Live Chat 24/7
+                                    </li>
+                                    <li className="flex items-center">
+                                        <svg className="w-4 h-4 text-green-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                                        </svg>
+                                        Bahasa Indonesia
+                                    </li>
+                                    <li className="flex items-center">
+                                        <svg className="w-4 h-4 text-green-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                                        </svg>
+                                        Technical Expert
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        {/* Additional Features */}
+                        <div className="bg-white rounded-3xl p-8 lg:p-12 shadow-sm border border-gray-100">
+                            <div className="text-center mb-12">
+                                <h3 className="text-2xl md:text-3xl font-bold text-gray-900 mb-4">
+                                    Fitur Lengkap untuk Semua Kebutuhan
+                                </h3>
+                                <p className="text-lg text-gray-600">
+                                    Dapatkan semua tools dan fitur yang Anda butuhkan untuk mengelola website dengan mudah
+                                </p>
+                            </div>
+
+                            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-6">
+                                <div className="text-center">
+                                    <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center mx-auto mb-3">
+                                        <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z" />
+                                        </svg>
+                                    </div>
+                                    <span className="text-sm font-medium text-gray-700">cPanel</span>
+                                </div>
+                                <div className="text-center">
+                                    <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center mx-auto mb-3">
+                                        <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4" />
+                                        </svg>
+                                    </div>
+                                    <span className="text-sm font-medium text-gray-700">MySQL</span>
+                                </div>
+                                <div className="text-center">
+                                    <div className="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center mx-auto mb-3">
+                                        <svg className="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                                        </svg>
+                                    </div>
+                                    <span className="text-sm font-medium text-gray-700">Email</span>
+                                </div>
+                                <div className="text-center">
+                                    <div className="w-12 h-12 bg-orange-100 rounded-xl flex items-center justify-center mx-auto mb-3">
+                                        <svg className="w-6 h-6 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                                        </svg>
+                                    </div>
+                                    <span className="text-sm font-medium text-gray-700">Analytics</span>
+                                </div>
+                                <div className="text-center">
+                                    <div className="w-12 h-12 bg-red-100 rounded-xl flex items-center justify-center mx-auto mb-3">
+                                        <svg className="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                                        </svg>
+                                    </div>
+                                    <span className="text-sm font-medium text-gray-700">Backup</span>
+                                </div>
+                                <div className="text-center">
+                                    <div className="w-12 h-12 bg-cyan-100 rounded-xl flex items-center justify-center mx-auto mb-3">
+                                        <svg className="w-6 h-6 text-cyan-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                                        </svg>
+                                    </div>
+                                    <span className="text-sm font-medium text-gray-700">CDN</span>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
 
                 {/* Testimonials Section */}
-                <div id="testimonials" className="relative z-10 py-20 bg-white/5 backdrop-blur-sm">
-                    <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div className="py-16 lg:py-24 bg-white">
+                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                         <div className="text-center mb-16">
-                            <h2 className="text-4xl font-bold text-white mb-4">
-                                Dipercaya oleh <span className="bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">Profesional</span>
+                            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+                                Dipercaya oleh 10,000+ Developer
                             </h2>
-                            <p className="text-white/70 text-lg">Testimoni dari para ahli teknologi yang telah merasakan keunggulan platform kami</p>
+                            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+                                Bergabunglah dengan ribuan developer dan perusahaan yang telah mempercayai AbahWeb untuk hosting mereka
+                            </p>
                         </div>
 
-                        <div className="relative">
-                            <div className="bg-white/10 backdrop-blur-xl rounded-3xl border border-white/20 p-8 lg:p-12">
-                                <div className="text-center">
-                                    <div className="text-6xl mb-6">{testimonials[currentTestimonial].avatar}</div>
-                                    <div className="flex justify-center mb-6">
-                                        {[...Array(testimonials[currentTestimonial].rating)].map((_, i) => (
-                                            <StarIcon key={i} className="w-6 h-6 text-yellow-400 fill-current" />
+                        {/* Trust Indicators */}
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-16">
+                            <div className="text-center">
+                                <div className="text-3xl font-bold text-blue-600 mb-2">99.9%</div>
+                                <div className="text-gray-600">Uptime Guarantee</div>
+                            </div>
+                            <div className="text-center">
+                                <div className="text-3xl font-bold text-green-600 mb-2">10,000+</div>
+                                <div className="text-gray-600">Happy Customers</div>
+                            </div>
+                            <div className="text-center">
+                                <div className="text-3xl font-bold text-purple-600 mb-2">24/7</div>
+                                <div className="text-gray-600">Expert Support</div>
+                            </div>
+                            <div className="text-center">
+                                <div className="text-3xl font-bold text-orange-600 mb-2">5★</div>
+                                <div className="text-gray-600">Average Rating</div>
+                            </div>
+                        </div>
+
+                        {/* Testimonials Grid */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                            <div className="bg-gray-50 rounded-2xl p-8 hover:shadow-lg transition-shadow duration-300">
+                                <div className="flex items-center mb-4">
+                                    <div className="flex text-yellow-400">
+                                        {[...Array(5)].map((_, i) => (
+                                            <svg key={i} className="w-5 h-5 fill-current" viewBox="0 0 20 20">
+                                                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                                            </svg>
                                         ))}
                                     </div>
-                                    <blockquote className="text-xl text-white/90 mb-8 italic leading-relaxed">
-                                        "{testimonials[currentTestimonial].content}"
-                                    </blockquote>
+                                </div>
+                                <p className="text-gray-700 mb-6">
+                                    "AbahWeb memberikan performa hosting yang luar biasa. Website saya loading 3x lebih cepat setelah pindah ke sini. Support team juga sangat responsif!"
+                                </p>
+                                <div className="flex items-center">
+                                    <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-full flex items-center justify-center text-white font-bold mr-4">
+                                        AR
+                                    </div>
                                     <div>
-                                        <div className="font-bold text-white text-lg">{testimonials[currentTestimonial].name}</div>
-                                        <div className="text-cyan-400 font-medium">{testimonials[currentTestimonial].role}</div>
+                                        <div className="font-semibold text-gray-900">Ahmad Rizki</div>
+                                        <div className="text-gray-600 text-sm">Full Stack Developer</div>
                                     </div>
                                 </div>
                             </div>
 
-                            {/* Testimonial Indicators */}
-                            <div className="flex justify-center mt-8 space-x-2">
-                                {testimonials.map((_, index) => (
-                                    <button
-                                        key={index}
-                                        onClick={() => setCurrentTestimonial(index)}
-                                        className={`w-3 h-3 rounded-full transition-all duration-300 ${
-                                            index === currentTestimonial 
-                                                ? 'bg-cyan-400 scale-125' 
-                                                : 'bg-white/30 hover:bg-white/50'
-                                        }`}
-                                    />
-                                ))}
+                            <div className="bg-gray-50 rounded-2xl p-8 hover:shadow-lg transition-shadow duration-300">
+                                <div className="flex items-center mb-4">
+                                    <div className="flex text-yellow-400">
+                                        {[...Array(5)].map((_, i) => (
+                                            <svg key={i} className="w-5 h-5 fill-current" viewBox="0 0 20 20">
+                                                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                                            </svg>
+                                        ))}
+                                    </div>
+                                </div>
+                                <p className="text-gray-700 mb-6">
+                                    "Sudah 2 tahun menggunakan AbahWeb dan tidak pernah kecewa. Uptime selalu stabil 99.9% dan fitur backup otomatis sangat membantu."
+                                </p>
+                                <div className="flex items-center">
+                                    <div className="w-12 h-12 bg-gradient-to-r from-green-500 to-emerald-500 rounded-full flex items-center justify-center text-white font-bold mr-4">
+                                        SP
+                                    </div>
+                                    <div>
+                                        <div className="font-semibold text-gray-900">Sari Putri</div>
+                                        <div className="text-gray-600 text-sm">E-commerce Owner</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="bg-gray-50 rounded-2xl p-8 hover:shadow-lg transition-shadow duration-300">
+                                <div className="flex items-center mb-4">
+                                    <div className="flex text-yellow-400">
+                                        {[...Array(5)].map((_, i) => (
+                                            <svg key={i} className="w-5 h-5 fill-current" viewBox="0 0 20 20">
+                                                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                                            </svg>
+                                        ))}
+                                    </div>
+                                </div>
+                                <p className="text-gray-700 mb-6">
+                                    "Tim support AbahWeb luar biasa! Mereka membantu migrasi website saya dengan sangat profesional dan cepat. Highly recommended!"
+                                </p>
+                                <div className="flex items-center">
+                                    <div className="w-12 h-12 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center text-white font-bold mr-4">
+                                        BH
+                                    </div>
+                                    <div>
+                                        <div className="font-semibold text-gray-900">Budi Hartono</div>
+                                        <div className="text-gray-600 text-sm">Digital Agency</div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                </div>
 
-                {/* CTA Section */}
-                <div className="relative z-10 py-32">
-                    <div className="max-w-4xl mx-auto text-center px-4 sm:px-6 lg:px-8">
-                        <h2 className="text-4xl lg:text-5xl font-bold text-white mb-6">
-                            Siap Memulai <span className="bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">Revolusi Digital</span>?
-                        </h2>
-                        <p className="text-xl text-white/70 mb-12 max-w-2xl mx-auto">
-                            Bergabunglah dengan ribuan developer dan perusahaan yang telah mempercayai AbahWeb untuk infrastruktur digital mereka
-                        </p>
-                        
-                        {!auth.user && (
-                            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                                <Link
-                                    href={route('register')}
-                                    className="group bg-gradient-to-r from-cyan-500 to-blue-600 text-white px-10 py-5 rounded-xl font-bold text-lg hover:from-cyan-600 hover:to-blue-700 transition-all duration-200 transform hover:scale-105 shadow-xl flex items-center justify-center"
-                                >
-                                    Mulai Gratis Sekarang
-                                    <ArrowRightIcon className="w-6 h-6 ml-2 group-hover:translate-x-1 transition-transform" />
-                                </Link>
-                                <button className="bg-white/10 backdrop-blur-sm text-white px-10 py-5 rounded-xl font-bold text-lg hover:bg-white/20 transition-all duration-200 border border-white/20">
-                                    Konsultasi Gratis
-                                </button>
+                        {/* CTA Section */}
+                        <div className="text-center mt-16">
+                            <div className="bg-gradient-to-r from-blue-600 to-purple-600 rounded-3xl p-8 lg:p-12 text-white">
+                                <h3 className="text-2xl md:text-3xl font-bold mb-4">
+                                    Siap Bergabung dengan Ribuan Developer Lainnya?
+                                </h3>
+                                <p className="text-xl mb-8 opacity-90">
+                                    Mulai hosting website Anda hari ini dengan paket yang sesuai kebutuhan
+                                </p>
+                                <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                                    <button className="bg-white text-blue-600 px-8 py-4 rounded-xl font-semibold hover:bg-gray-100 transition-colors duration-300">
+                                        Mulai Gratis
+                                    </button>
+                                    <button className="border-2 border-white text-white px-8 py-4 rounded-xl font-semibold hover:bg-white hover:text-blue-600 transition-colors duration-300">
+                                        Lihat Paket
+                                    </button>
+                                </div>
                             </div>
-                        )}
+                        </div>
                     </div>
                 </div>
 
