@@ -937,7 +937,7 @@ export default function Welcome({ auth, laravelVersion, phpVersion, content = {}
                                 {/* Subtitle */}
                                 <p className="text-xl text-gray-300 mb-8 leading-relaxed animate-slide-up delay-200">
                                     Hosting berkualitas tinggi dengan performa maksimal, keamanan terdepan, dan dukungan 24/7. 
-                                    Mulai dari Rp 15.000/bulan.
+                                    Mulai dari Rp 25.000/bulan.
                                 </p>
 
                                 {/* CTA Section */}
