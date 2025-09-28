@@ -14,7 +14,7 @@ class HostingPackageController extends Controller
             ->orderBy('sort_order')
             ->get()
             ->map(function ($package) {
-                $package->features = json_decode($package->features, true);
+                $package->features = is_string($package->features) ? json_decode($package->features, true) : $package->features;
                 return $package;
             });
 
@@ -25,7 +25,7 @@ class HostingPackageController extends Controller
 
     public function show(HostingPackage $package)
     {
-        $package->features = json_decode($package->features, true);
+        $package->features = is_string($package->features) ? json_decode($package->features, true) : $package->features;
         
         return Inertia::render('HostingPackageDetail', [
             'package' => $package

@@ -21,6 +21,8 @@ class HostingPackage extends Model
         'support_24_7',
         'features',
         'badge',
+        'image',
+        'icon',
         'is_active',
         'sort_order'
     ];

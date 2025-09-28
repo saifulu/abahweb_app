@@ -416,15 +416,20 @@ export default function Welcome({ auth, laravelVersion, phpVersion, content = {}
                     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                         <div className="flex justify-between h-16 lg:h-20">
                             <div className="flex items-center">
-                                <div className="flex items-center space-x-2 hover-lift cursor-pointer group">
-                                    <img 
-                                        src="/images/logoabahweb.svg" 
-                                        alt="AbahWeb Logo" 
-                                        className="h-8 lg:h-10 w-auto group-hover:scale-105 transition-transform duration-300"
-                                    />
-                                    <h1 className="text-xl lg:text-2xl font-bold text-white group-hover:text-blue-300 transition-colors duration-300">
-                                        AbahWeb
-                                    </h1>
+                                <div className="flex items-center space-x-4 hover-lift cursor-pointer group">
+                                    <div className="relative">
+                                        <img 
+                                            src="/images/logoabahweb.svg" 
+                                            alt="AbahWeb Logo" 
+                                            className="h-12 lg:h-14 w-auto rounded-2xl group-hover:scale-110 transition-all duration-500 ease-out"
+                                        />
+                                        <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-blue-400/20 via-purple-500/20 to-pink-500/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                                    </div>
+                                    <div className="relative">
+                                        <h1 className="text-2xl lg:text-3xl font-bold text-white group-hover:text-blue-100 transition-all duration-500">
+                                            <span className="relative z-10">AbahWeb</span>
+                                        </h1>
+                                    </div>
                                 </div>
                             </div>
                             

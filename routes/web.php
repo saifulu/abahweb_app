@@ -17,7 +17,10 @@ use App\Http\Controllers\Admin\CmsController;
 use App\Http\Controllers\Admin\HostingPackageController as AdminHostingPackageController;
 use App\Http\Controllers\Admin\HomepageContentController;
 use App\Http\Controllers\Admin\LogoController;
+use App\Http\Controllers\Admin\ImageUploadController;
 use App\Http\Controllers\WelcomeController;
+use App\Http\Controllers\CmsAuthController;
+use App\Http\Controllers\CmsLandingPageController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -71,6 +74,34 @@ Route::middleware('auth')->group(function () {
                 ->name('logout');
 });
 
+// CMS Authentication Routes (separate from main auth)
+Route::middleware('guest')->group(function () {
+    Route::get('/login-cms', [CmsAuthController::class, 'showLoginForm'])->name('cms.login');
+    Route::post('/login-cms', [CmsAuthController::class, 'login'])->name('cms.login.post');
+});
+
+// CMS Routes (admin only)
+Route::prefix('cms')->name('cms.')->group(function () {
+    Route::get('/', [CmsLandingPageController::class, 'index'])->name('dashboard');
+    Route::get('/content/{id}/edit', [CmsLandingPageController::class, 'edit'])->name('content.edit');
+    Route::put('/content/{id}', [CmsLandingPageController::class, 'update'])->name('content.update');
+    Route::post('/logout', [CmsAuthController::class, 'logout'])->name('logout');
+    
+    // Hosting Packages Routes for CMS
+    Route::get('/hosting-packages', [CmsLandingPageController::class, 'hostingPackages'])->name('hosting-packages.index');
+    Route::get('/hosting-packages/create', [CmsLandingPageController::class, 'createHostingPackage'])->name('hosting-packages.create');
+    Route::post('/hosting-packages', [CmsLandingPageController::class, 'storeHostingPackage'])->name('hosting-packages.store');
+    Route::get('/hosting-packages/{id}/edit', [CmsLandingPageController::class, 'editHostingPackage'])->name('hosting-packages.edit');
+    Route::put('/hosting-packages/{id}', [CmsLandingPageController::class, 'updateHostingPackage'])->name('hosting-packages.update');
+    Route::delete('/hosting-packages/{id}', [CmsLandingPageController::class, 'destroyHostingPackage'])->name('hosting-packages.destroy');
+    
+    // API Routes for CMS
+    Route::get('/api/contents', [CmsLandingPageController::class, 'getContents'])->name('api.contents');
+    Route::put('/api/content/{id}', [CmsLandingPageController::class, 'updateContent'])->name('api.content.update');
+    Route::patch('/api/content/{id}/toggle', [CmsLandingPageController::class, 'toggleActive'])->name('api.content.toggle');
+    Route::put('/api/contents/order', [CmsLandingPageController::class, 'updateOrder'])->name('api.contents.order');
+});
+
 // Protected Routes
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
@@ -97,6 +128,13 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::resource('hosting-packages', AdminHostingPackageController::class);
         Route::resource('homepage-content', HomepageContentController::class);
         Route::resource('logos', LogoController::class);
+        
+        // Image Upload Routes
+        Route::prefix('images')->name('images.')->group(function () {
+            Route::post('/upload', [ImageUploadController::class, 'upload'])->name('upload');
+            Route::delete('/delete', [ImageUploadController::class, 'delete'])->name('delete');
+            Route::get('/list', [ImageUploadController::class, 'list'])->name('list');
+        });
     });
 });
 

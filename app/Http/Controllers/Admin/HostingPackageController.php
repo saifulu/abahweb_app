@@ -15,7 +15,7 @@ class HostingPackageController extends Controller
     public function index()
     {
         $packages = HostingPackage::orderBy('sort_order')->get()->map(function ($package) {
-            $package->features = json_decode($package->features, true);
+            $package->features = is_string($package->features) ? json_decode($package->features, true) : $package->features;
             return $package;
         });
 
@@ -69,7 +69,7 @@ class HostingPackageController extends Controller
      */
     public function show(HostingPackage $hostingPackage)
     {
-        $hostingPackage->features = json_decode($hostingPackage->features, true);
+        $hostingPackage->features = is_string($hostingPackage->features) ? json_decode($hostingPackage->features, true) : $hostingPackage->features;
         
         return Inertia::render('Admin/HostingPackages/Show', [
             'package' => $hostingPackage
@@ -81,7 +81,7 @@ class HostingPackageController extends Controller
      */
     public function edit(HostingPackage $hostingPackage)
     {
-        $hostingPackage->features = json_decode($hostingPackage->features, true);
+        $hostingPackage->features = is_string($hostingPackage->features) ? json_decode($hostingPackage->features, true) : $hostingPackage->features;
         
         return Inertia::render('Admin/HostingPackages/Edit', [
             'package' => $hostingPackage
